@@ -4,15 +4,17 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
-
+#include <string>
 
 void setup() {
   
+  const std::string MANDATORY_PREFIX = "TERRA-IOT";
+
   Serial.begin(115200);
   delay(1500);
   Serial.println("Start...");
 
-  BLEDevice::init("TERRA-IOT-ESP32");
+  BLEDevice::init(std::string(MANDATORY_PREFIX) + std::string("ESP32"));
   Serial.println("init...");
 
   BLEServer *pServer = BLEDevice::createServer();
