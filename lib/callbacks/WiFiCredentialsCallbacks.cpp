@@ -38,18 +38,15 @@ void WiFiCredentialsCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
 }
 
 void WiFiCredentialsCallbacks::saveWiFiCredentials(const char* ssid, const char* password) {
-  // TODO wifi client connect  
   preferences.begin("wifi-creds", false);
   preferences.putString("ssid", ssid);
   preferences.putString("password", password);
   preferences.end();
-
   Serial->println("Credentials saved successfully");
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial->println("\nConnecting");
-
-
   unsigned long startAttemptTime = millis();
   const unsigned long timeout = 30000; // 30 secondes
 
