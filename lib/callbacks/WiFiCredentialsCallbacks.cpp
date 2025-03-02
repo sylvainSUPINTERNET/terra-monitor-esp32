@@ -38,8 +38,32 @@ void WiFiCredentialsCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
 }
 
 void WiFiCredentialsCallbacks::saveWiFiCredentials(const char* ssid, const char* password) {
+  // TODO wifi client connect  
   preferences.begin("wifi-creds", false);
   preferences.putString("ssid", ssid);
   preferences.putString("password", password);
   preferences.end();
+
+  Serial->println("Credentials saved successfully");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid, password);
+  Serial->println("\nConnecting");
+
+
+  unsigned long startAttemptTime = millis();
+  const unsigned long timeout = 30000; // 30 secondes
+
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    Serial->print(".");
+    delay(300);
+  }
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial->println("\nFailed to connect to the WiFi network (timeout)");
+  } else {
+    Serial->println("\nConnected to the WiFi network");
+    Serial->print("Local ESP32 IP: ");
+    Serial->println(WiFi.localIP());
+  }
+
 }

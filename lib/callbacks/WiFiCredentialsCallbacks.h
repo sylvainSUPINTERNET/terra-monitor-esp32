@@ -5,6 +5,7 @@
 #include <HardwareSerial.h>
 #include <Preferences.h>
 #include <ArduinoJson.h>
+#include <WiFi.h>
 
 class WiFiCredentialsCallbacks : public BLECharacteristicCallbacks {
   public:
