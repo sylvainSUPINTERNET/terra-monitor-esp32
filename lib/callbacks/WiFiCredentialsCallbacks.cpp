@@ -17,6 +17,8 @@ void WiFiCredentialsCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
     if (error) {
       Serial->print(F("deserializeJson() failed: "));
       Serial->println(error.c_str());
+      pCharacteristic->setValue("ERROR");
+      pCharacteristic->notify();
       return;
     }
 
@@ -25,6 +27,8 @@ void WiFiCredentialsCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
 
     if (strlen(ssid) == 0 || strlen(password) == 0) {
       Serial->println("Erreur: SSID ou password manquant dans le JSON.");
+      pCharacteristic->setValue("ERROR");
+      pCharacteristic->notify();
       return;
     }
 
@@ -33,11 +37,11 @@ void WiFiCredentialsCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
     Serial->print("Password: ");
     Serial->println(password);
 
-    saveWiFiCredentials(ssid, password);
+    saveWiFiCredentials(ssid, password, pCharacteristic);
   }
 }
 
-void WiFiCredentialsCallbacks::saveWiFiCredentials(const char* ssid, const char* password) {
+void WiFiCredentialsCallbacks::saveWiFiCredentials(const char* ssid, const char* password, BLECharacteristic *pCharacteristic) {
   preferences.begin("wifi-creds", false);
   preferences.putString("ssid", ssid);
   preferences.putString("password", password);
@@ -57,10 +61,14 @@ void WiFiCredentialsCallbacks::saveWiFiCredentials(const char* ssid, const char*
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial->println("\nFailed to connect to the WiFi network (timeout)");
+    pCharacteristic->setValue("ERROR");
+    pCharacteristic->notify();
   } else {
     Serial->println("\nConnected to the WiFi network");
     Serial->print("Local ESP32 IP: ");
     Serial->println(WiFi.localIP());
+    pCharacteristic->setValue("OK");
+    pCharacteristic->notify();
   }
 
 }

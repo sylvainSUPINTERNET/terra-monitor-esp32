@@ -41,7 +41,7 @@ void setup() {
   BLEService *pServicePairing = pServer->createService(serviceWiFiCredsUUID);
   BLECharacteristic *pCharacteristicPairing = pServicePairing->createCharacteristic(
                                          characteristicWiFiCredsUUID,
-                                         BLECharacteristic::PROPERTY_WRITE);
+                                         BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
   pCharacteristicPairing->setCallbacks(new WiFiCredentialsCallbacks(&Serial));
   pServicePairing->start();
 
@@ -50,7 +50,7 @@ void setup() {
 
   Serial.println("Service : " + String(serviceWiFiCredsUUID));
   Serial.println("Characteristic : " + String(characteristicWiFiCredsUUID));
-  Serial.println("Characteristic defined! Now you can read it in your phone!");
+  Serial.println("Characteristic defined! Now you can read/write it in your phone");
 
 
 

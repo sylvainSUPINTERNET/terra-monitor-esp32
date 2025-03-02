@@ -27,6 +27,7 @@ class WiFiCredentialsCallbacks : public BLECharacteristicCallbacks {
         if (error) {
           Serial->print(F("deserializeJson() failed: "));
           Serial->println(error.c_str());
+          
           return;
         } else {
             const char* ssid = doc["ssid"];

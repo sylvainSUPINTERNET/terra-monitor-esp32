@@ -15,7 +15,7 @@ class WiFiCredentialsCallbacks : public BLECharacteristicCallbacks {
     Preferences preferences;
 
     void onWrite(BLECharacteristic *pCharacteristic);
-    void saveWiFiCredentials(const char* ssid, const char* password);
+    void saveWiFiCredentials(const char* ssid, const char* password, BLECharacteristic *pCharacteristic);
 };
 
 #endif
