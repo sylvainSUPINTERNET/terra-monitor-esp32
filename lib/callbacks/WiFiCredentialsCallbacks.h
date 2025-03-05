@@ -10,7 +10,7 @@
 class WiFiCredentialsCallbacks : public BLECharacteristicCallbacks {
   public:
     WiFiCredentialsCallbacks(HardwareSerial* Serial);
-
+    virtual ~WiFiCredentialsCallbacks() {}
   protected:
     HardwareSerial* Serial;
     Preferences preferences;
