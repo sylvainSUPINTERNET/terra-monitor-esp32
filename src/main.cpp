@@ -2,6 +2,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
+#include <Preferences.h>
 
 #define DNS_PORT 53
 
@@ -15,12 +16,12 @@ void setup() {
   WiFi.mode(WIFI_AP);
   WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
   WiFi.softAP("ESP32_SETUP", nullptr, 6);
-  Serial.print("🚀 AP lancé. IP : ");
+  Serial.print("🚀 AP started. IP : ");
   Serial.println(WiFi.softAPIP());
 
   dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
   dnsServer.start(DNS_PORT, "*", apIP);
-  Serial.println("📡 DNS Server démarré");
+  Serial.println("📡 DNS Server started");
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     Serial.println("📥 Requête sur /");
@@ -45,7 +46,7 @@ void setup() {
     Serial.println("📡 SSID: " + ssid);
     Serial.println("🔑 Password: " + password);
 
-    request->send(200, "text/html", "<h1>Merci ! Connexion en cours...</h1>");
+    request->send(200, "text/html", "<h1>Connecting ...</h1>");
 
     delay(1000);
 
@@ -53,7 +54,7 @@ void setup() {
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid.c_str(), password.c_str());
 
-    Serial.println("🔄 Tentative de connexion...");
+    Serial.println("Attempt to connect...");
     int attempts = 0;
     while (WiFi.status() != WL_CONNECTED && attempts < 20) {
       delay(500);
@@ -61,9 +62,14 @@ void setup() {
       attempts++;
     }
     if (WiFi.status() == WL_CONNECTED) {
-      Serial.println("\n✅ Connecté ! IP: " + WiFi.localIP().toString());
+      Serial.println("Connected ! IP: " + WiFi.localIP().toString());
+      Preferences preferences;
+      preferences.begin("wifi", false);
+      preferences.putString("ssid", ssid);
+      preferences.putString("password", password);
+      preferences.end();
     } else {
-      Serial.println("\n❌ Échec. Retour en mode AP.");
+      Serial.println("\nFailed to connect. Back to mode AP.");
       WiFi.disconnect();
       WiFi.mode(WIFI_AP);
       WiFi.softAP("ESP32_SETUP", nullptr, 6);
@@ -71,8 +77,8 @@ void setup() {
   }).setFilter(ON_AP_FILTER);
 
   server.onNotFound([](AsyncWebServerRequest *request){
-    Serial.println("📥 Requête inconnue : " + request->url());
-    request->redirect("http://192.168.4.1/");
+    Serial.println("Unknown endpoint : " + request->url());
+    request->redirect(WiFi.softAPIP().toString());
   });
 
   server.begin();
